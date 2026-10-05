@@ -1,0 +1,4 @@
+import { Link } from 'react-router-dom';
+import { ArrowRight, BriefcaseBusiness, MapPin } from 'lucide-react';
+import { Card } from '../components/ui';
+export default function JobsPageCard({job}) { return <Link to={`/jobs/${job.id}`} className="job-card-link"><Card className="job-card"><div className="job-card-heading"><span className="company-avatar">{job.companyName?.[0]}</span><span className="job-company">{job.companyName}</span><span className="job-age">{new Intl.DateTimeFormat('en',{month:'short',day:'numeric'}).format(new Date(job.createdAt))}</span></div><h3>{job.title}</h3><div className="job-metadata"><span><MapPin size={14}/>{job.location}</span><span><BriefcaseBusiness size={14}/>{job.jobType?.replace('_',' ')}</span></div><div className="job-card-bottom"><span>{job.salaryRange || 'Compensation discussed'}</span><span className="job-arrow"><ArrowRight size={16}/></span></div></Card></Link>; }

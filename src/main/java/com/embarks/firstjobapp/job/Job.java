@@ -1,71 +1,49 @@
 package com.embarks.firstjobapp.job;
 
+import com.embarks.firstjobapp.user.User;
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.time.Instant;
+
+@Entity
+@Table(name = "jobs", indexes = {@Index(name = "idx_job_location", columnList = "location"), @Index(name = "idx_job_created", columnList = "createdAt")})
+@Getter
+@Setter
+@NoArgsConstructor
 public class Job {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(nullable = false, length = 160)
     private String title;
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
-    private String maxSalary;
-    private String minSalary;
+    @Column(nullable = false, length = 160)
+    private String companyName;
+    @Column(nullable = false, length = 160)
     private String location;
+    @Column(length = 100)
+    private String salaryRange;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private JobType jobType;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "posted_by_id")
+    private User postedBy;
+    @Column(nullable = false, updatable = false)
+    private Instant createdAt;
+    @Column(nullable = false)
+    private Instant updatedAt;
 
-    public Job( Long id, String title, String location, String minSalary, String maxSalary, String description) {
-        this.id = id;
-        this.title = title;
-        this.minSalary = minSalary;
-        this.maxSalary = maxSalary;
-        this.location = location;
-        this.description = description;
+    @PrePersist
+    void create() {
+        createdAt = Instant.now();
+        updatedAt = createdAt;
     }
 
-    public Job() {
-
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getMaxSalary() {
-        return maxSalary;
-    }
-
-    public void setMaxSalary(String maxSalary) {
-        this.maxSalary = maxSalary;
-    }
-
-    public String getMinSalary() {
-        return minSalary;
-    }
-
-    public void setMinSalary(String minSalary) {
-        this.minSalary = minSalary;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
+    @PreUpdate
+    void update() {
+        updatedAt = Instant.now();
     }
 }
