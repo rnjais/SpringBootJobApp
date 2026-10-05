@@ -11,4 +11,4 @@ export const useJobFilters = create<FilterState>()(persist((set) => ({
   ...defaults, view: "grid",
   setFilter: (key, value) => set({ [key]: value, ...(key !== "page" ? { page: 0 } : {}) } as Partial<FilterState>),
   setJobType: (jobType) => set({ jobType, page: 0 }), setView: (view) => set({ view }), reset: () => set({ ...defaults }),
-}), { name: "northstar-job-filters", partialize: (state) => ({ view: state.view }) as FilterState }));
+}), { name: "northstar-job-filters", partialize: (state) => ({ view: state.view }) as FilterState, skipHydration: true }));

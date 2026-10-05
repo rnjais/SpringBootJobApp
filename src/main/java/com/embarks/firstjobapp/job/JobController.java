@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -38,6 +39,7 @@ public class JobController {
     }
 
     @GetMapping
+    @Transactional(readOnly = true)
     public Page<JobView> search(@RequestParam(required = false) String keyword, @RequestParam(required = false) String location, @RequestParam(required = false) JobType jobType, @PageableDefault(size = 12, sort = "createdAt", direction = Sort.Direction.DESC) Pageable page) {
         Specification<Job> s = (root, q, cb) -> cb.conjunction();
         if (keyword != null && !keyword.isBlank()) {
@@ -51,16 +53,19 @@ public class JobController {
     }
 
     @GetMapping("/featured")
+    @Transactional(readOnly = true)
     public List<JobView> featured() {
         return jobs.findTop6ByOrderByCreatedAtDesc().stream().map(this::view).toList();
     }
 
     @GetMapping("/{id}")
+    @Transactional(readOnly = true)
     public JobView one(@PathVariable Long id) {
         return view(jobs.findById(id).orElseThrow(() -> new NoSuchElementException("Job not found")));
     }
 
     @GetMapping("/recruiter/my-jobs")
+    @Transactional(readOnly = true)
     public List<JobView> mine(Authentication a) {
         var u = users.findByEmailIgnoreCase(a.getName()).orElseThrow();
         return jobs.findByPostedByIdOrderByCreatedAtDesc(u.getId()).stream().map(this::view).toList();
@@ -68,6 +73,7 @@ public class JobController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @Transactional
     public JobView create(@Valid @RequestBody JobRequest r, Authentication a) {
         var u = users.findByEmailIgnoreCase(a.getName()).orElseThrow();
         Job j = new Job();
@@ -77,6 +83,7 @@ public class JobController {
     }
 
     @PutMapping("/{id}")
+    @Transactional
     public JobView update(@PathVariable Long id, @Valid @RequestBody JobRequest r, Authentication a) {
         Job j = owned(id, a);
         copy(r, j);
@@ -85,6 +92,7 @@ public class JobController {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Transactional
     public void delete(@PathVariable Long id, Authentication a) {
         jobs.delete(owned(id, a));
     }

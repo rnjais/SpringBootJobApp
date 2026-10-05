@@ -15,6 +15,18 @@ Full-stack job portal with a Spring Boot REST API and a React/Vite client.
 3. From this directory run `./mvnw spring-boot:run` (Windows: `mvnw.cmd spring-boot:run`). The API listens on port 8081.
 4. In `frontend`, run `npm install` and `npm run dev`. Vite serves the app on port 5173 and proxies `/api` to Spring Boot.
 
+## Next.js App Router frontend
+
+An App Router/TypeScript implementation is available alongside the original Vite client in `frontend-next`. It uses port 3000 and proxies API requests to `http://localhost:8081` by default:
+
+```powershell
+cd frontend-next
+npm install
+npm run dev
+```
+
+See `frontend-next/ARCHITECTURE.md` for the feature modules, data/state boundaries, and API capabilities that still need backend support.
+
 ## Production configuration
 
 Set `SPRING_PROFILES_ACTIVE=prod`, `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`, `JWT_SECRET`, `APP_CORS_ORIGINS` (comma-separated exact origins), and `UPLOAD_DIR` to persistent private storage. Production schema management is validate-only; deploy versioned database migrations before application rollout. Put the API behind HTTPS and a reverse proxy. Never commit production secrets.

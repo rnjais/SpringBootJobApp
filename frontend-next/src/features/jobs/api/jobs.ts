@@ -16,12 +16,14 @@ export async function getJobs(filters: JobFilters, signal?: AbortSignal): Promis
 }
 export async function uploadResume(file: File, signal?: AbortSignal): Promise<{ resumeUrl: string }> {
   const body = new FormData(); body.append("file", file);
-  const response = await fetch("/api/v1/uploads/resume", { method: "POST", body, signal });
+  const token = typeof window === "undefined" ? null : localStorage.getItem("token");
+  const response = await fetch("/api/v1/uploads/resume", { method: "POST", body, signal, headers: token ? { Authorization: `Bearer ${token}` } : {} });
   if (!response.ok) throw new Error("Resume upload failed. Please try again.");
   return response.json() as Promise<{ resumeUrl: string }>;
 }
 export async function submitApplication(payload: { jobId: number; resumeUrl: string; coverLetter: string; answers: Record<string, string> }, signal?: AbortSignal) {
-  const response = await fetch(`/api/v1/applications?jobId=${payload.jobId}`, { method: "POST", signal, headers: { "Content-Type": "application/json" }, body: JSON.stringify({ resumeUrl: payload.resumeUrl, coverLetter: payload.coverLetter, answers: payload.answers }) });
+  const token = typeof window === "undefined" ? null : localStorage.getItem("token");
+  const response = await fetch(`/api/v1/applications?jobId=${payload.jobId}`, { method: "POST", signal, headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) }, body: JSON.stringify({ resumeUrl: payload.resumeUrl, coverLetter: payload.coverLetter, answers: payload.answers }) });
   if (!response.ok) throw new Error(response.status === 409 ? "You’ve already applied to this role." : "We couldn't submit your application. Please try again.");
   return response.json() as Promise<{ id: number }>;
 }

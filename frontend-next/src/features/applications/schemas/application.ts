@@ -7,11 +7,12 @@ export const applicationSchema = z.object({
   phone: z.string().trim().min(7, "Enter a phone number").max(32),
   resumeFileName: z.string().min(1, "Attach a resume to continue"),
   coverLetter: z.string().max(10_000, "Keep your note under 10,000 characters"),
-  workAuthorization: z.enum(["yes", "no"], { error: "Choose an answer" }),
+  workAuthorization: z.union([z.literal(""), z.enum(["yes", "no"])]).pipe(z.enum(["yes", "no"], { error: "Choose an answer" })),
   startDate: z.string().min(1, "Select your earliest start date"),
   experience: z.string().min(1, "Choose your years of experience"),
 });
-export type ApplicationFormValues = z.infer<typeof applicationSchema>;
+export type ApplicationFormValues = z.input<typeof applicationSchema>;
+export type ApplicationSubmissionValues = z.output<typeof applicationSchema>;
 export const applicationSteps = [
   { title: "Your details", fields: ["firstName", "lastName", "email", "phone"] as const },
   { title: "Resume & note", fields: ["resumeFileName", "coverLetter"] as const },
